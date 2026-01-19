@@ -1,3 +1,15 @@
+import pool from "../config/db.js";
+
+const seed = async () => {
+  try {
+    await pool.query("DELETE FROM incidents");
+    await pool.query("DELETE FROM visits");
+    await pool.query("DELETE FROM users");
+
+    const usersRes = await pool.query(`
+      INSERT INTO users (name, email, username, password, role)
+      VALUES
+        ('System Administrator', 'admin@htu.edu', 'admin', 'admin123', 'admin'),
 import pool from '../config/db.js';
 const seed = async () => {
     try {
@@ -12,6 +24,12 @@ const seed = async () => {
         ('Ahmed Hassan', 'ahmed.hassan@htu.edu', 'security1', 'security123', 'security')
       RETURNING id, role;
     `);
+
+    const staffId = usersRes.rows.find(u => u.role === "staff").id;
+
+    const visitsRes = await pool.query(
+      `
+      INSERT INTO visits
     const staffId= usersRes.rows.find(user => user.role === 'staff').id;
     const visitsRes= await pool.query(`
             INSERT INTO visits
@@ -24,6 +42,10 @@ const seed = async () => {
       `,
       [staffId]
     );
+
+    await pool.query(
+      `
+      INSERT INTO incidents (visit_id, description)
     await pool.query(`
         INSERT INTO incidents (visit_id, description)
       VALUES
@@ -32,6 +54,15 @@ const seed = async () => {
       `,
       [visitsRes.rows[0].id, visitsRes.rows[1].id]
     );
+
+    console.log("Database seeded successfully");
+    process.exit(0);
+  } catch (e) {
+    console.error("Seeding failed:", e.message);
+    process.exit(1);
+  }
+};
+
         console.log("Seeding completed successfully.");
         process.exit(0);
     } catch (error) {

@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../config/db.config.js';
+import pool from '../config/db.js';
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
