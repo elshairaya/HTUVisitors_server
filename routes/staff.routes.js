@@ -43,8 +43,8 @@ router.get("/visits", Auth, Roles("staff"), async (req, res) => {
     try{
         await handleOverdueVisits();
     const result = status
-        ? await pool.query("SELECT * FROM visits WHERE status = $1 ORDER BY id DESC", [status])
-        : await pool.query("SELECT * FROM visits ORDER BY id DESC");
+        ? await pool.query("SELECT * FROM visits WHERE status = $1 AND created_by = $2 ORDER BY id DESC", [status, req.user.id])
+        : await pool.query("SELECT * FROM visits WHERE created_by = $1 ORDER BY id DESC", [req.user.id]);
     res.json(result.rows);
     }
     catch (error) {
@@ -56,12 +56,13 @@ router.get("/visits", Auth, Roles("staff"), async (req, res) => {
 router.get("/incidents", Auth, Roles("staff"), async (req, res) => {
     try{
  const result = await pool.query(`
-      SELECT i.id, i.description,i.reported_at,
-             v.name, v.host, v.access_code
+      SELECT i.description,i.created_at,
+             v.visitor_name, v.host_name, v.access_code
       FROM incidents i
       JOIN visits v ON v.id = i.visit_id
-      ORDER BY i.reported_at DESC
-    `);
+        WHERE v.created_by = $1
+      ORDER BY i.created_at DESC
+    `, [req.user.id]);
         res.json(result.rows);
     }
     catch (error) {
