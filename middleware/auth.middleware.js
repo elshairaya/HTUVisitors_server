@@ -1,7 +1,7 @@
-import pool from '../config/db.config.js';
+import pool from '../config/db.js';
 
 const authMiddleware = async (req, res, next) => {
-    const userId = req.header["x-user-id"];
+    const userId = req.headers["x-user-id"];
     if (!userId) {
         return res.status(401).json({ message: "Unauthorized: No user ID provided" });
     }
