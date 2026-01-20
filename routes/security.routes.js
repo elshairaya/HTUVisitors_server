@@ -4,20 +4,6 @@ import Auth from "../middleware/auth.middleware.js";
 import Roles from "../middleware/role.middleware.js";
 import { handleOverdueVisits } from "../utils/overdue.js";
 const router = express.Router();
-router.post("/validate", Auth, Roles("security"), async (req, res) => {
-    const { access_code } = req.body||{};
-    try {
-        await handleOverdueVisits();
-        const result = await pool.query("SELECT * FROM visits WHERE access_code = $1", [access_code]);
-        if (!result.rows.length) {
-            return res.status(404).json({ message: "Invalid access code" });
-        }
-        res.json(result.rows[0]);
-    } catch (error) {
-        console.error("Error validating access code:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
 
 router.post("/check-in", Auth, Roles("security"), async (req, res) => {
     

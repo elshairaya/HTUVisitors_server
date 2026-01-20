@@ -20,7 +20,7 @@ router.post("/visits", Auth, Roles("staff"), async (req, res) => {
         );
         try{
         await sendAccessCodeEmail({
-            to: visitor_email,
+        to: visitor_email,
         visitorName: visitor_name,
         accessCode: access_code,
         hostName: host_name,
@@ -38,14 +38,15 @@ router.post("/visits", Auth, Roles("staff"), async (req, res) => {
     }
 });
 
-router.get("/visits", Auth, Roles("staff"), async (req, res) => {
+router.get("/visits", Auth, Roles("staff","security"), async (req, res) => {
     const {status} = req.query;
     try{
         await handleOverdueVisits();
-    const result = status
-        ? await pool.query("SELECT * FROM visits WHERE status = $1 AND created_by = $2 ORDER BY id DESC", [status, req.user.id])
-        : await pool.query("SELECT * FROM visits WHERE created_by = $1 ORDER BY id DESC", [req.user.id]);
-    res.json(result.rows);
+    const result = await pool.query
+    (`SELECT *
+      FROM visits
+      ORDER BY created_at DESC
+    `); res.json(result.rows);
     }
     catch (error) {
         console.error("Error fetching visits:", error);
@@ -56,8 +57,8 @@ router.get("/visits", Auth, Roles("staff"), async (req, res) => {
 router.get("/incidents", Auth, Roles("staff"), async (req, res) => {
     try{
  const result = await pool.query(`
-      SELECT i.description,i.created_at,
-             v.visitor_name, v.host_name, v.access_code
+      SELECT i.id, i.description,i.created_at,
+             v.visitor_name, v.host_name, v.access_code, v.purpose
       FROM incidents i
       JOIN visits v ON v.id = i.visit_id
         WHERE v.created_by = $1
