@@ -24,7 +24,8 @@ The system manages visitors, staff operations, security check-in/check-out, inci
  cd htu-visitors-server
  npm install
 
-# 2. Create PostgeSQL database (e.g., htu_visitors_db)
+# 2. Create PostgeSQL database (e.g., htu_visitors_db) the schema is available in schema.sql
+
 # 3. Seed database
 npm run seed
 
@@ -59,7 +60,8 @@ HTUVisiting-Backend/
 ├── .env
 ├── .env_sample
 ├── package.json
-└── README.md
+├── README.md
+└── schema.sql
 ```
 ---
 ## API Endpoints
@@ -152,19 +154,9 @@ Example:
 **Base URL**:`/security`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST   | `/validate`| Check access code|
 | POST    | `/check-in`| Check in visitor|
 | POST   | `/check-out`| Check out visitor|
 
-- POST `security/validate`
-
-Example:
-```json
-{
-  "access_code": "HTU-482193"
-}
-
-```
 - POST `security/check-in`
 
 Example:
