@@ -154,10 +154,11 @@ Example:
 **Base URL**:`/security`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST    | `/check-in`| Check in visitor|
-| POST   | `/check-out`| Check out visitor|
+| GET    | `/visits` | Get all visitors|
+| PUT    | `/check-in`| Check in visitor|
+| PUT   | `/check-out`| Check out visitor|
 
-- POST `security/check-in`
+- PUt `security/check-in`
 
 Example:
 ```json
@@ -166,7 +167,7 @@ Example:
 }
 
 ```
-- POST `security/check-out`
+- PUT `security/check-out`
 
 Example:
 ```json
