@@ -25,7 +25,7 @@ router.post("/visits", Auth, Roles("staff"), async (req, res) => {
         accessCode: access_code,
         hostName: host_name,
         expectedCheckout: expected_check_out,});
-    console.log("Access code email sent successfully");    
+        console.log("Access code email sent successfully");    
     }
         catch(err){
             console.error("Error sending email:", err);
@@ -43,10 +43,17 @@ router.get("/visits", Auth, Roles("staff","security"), async (req, res) => {
     try{
         await handleOverdueVisits();
     const result = await pool.query
-    (`SELECT *
-      FROM visits
-      ORDER BY created_at DESC
-    `); res.json(result.rows);
+    (  `
+  SELECT *
+  FROM visits v
+  WHERE $1 = 'security'
+     OR v.host_name = $2
+  ORDER BY v.created_at DESC
+  `,
+  [req.user.role, req.user.name]
+);
+
+    res.json(result.rows);
     }
     catch (error) {
         console.error("Error fetching visits:", error);
