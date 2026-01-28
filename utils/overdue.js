@@ -11,14 +11,18 @@ try{
       AND expected_check_out < NOW()
   `);
 
-  await pool.query(`
-    INSERT INTO incidents (visit_id, description)
-    SELECT v.id, 'Visitor did not check out by expected time'
-    FROM visits v
-    LEFT JOIN incidents i ON i.visit_id = v.id
-    WHERE v.status = 'overdue'
-      AND i.id IS NULL
+  await pool.query(
+    //inserts results from a SELECT query. only if the visit does not have an incident record
+    `INSERT INTO incidents (visit_id, description)
+   SELECT v.id, 'Visitor did not check out by expected time'
+   FROM visits v
+   WHERE v.status = 'overdue'
+   AND NOT EXISTS (
+    SELECT 1
+    FROM incidents i
+    WHERE i.visit_id = v.id
   `);
+
   console.log("Overdue visits processed successfully.");
 }
 catch(error){
